@@ -1,5 +1,4 @@
 const ixcService = require("../serveces/ixcService");
-const { verifyToken } = require("../middlewares/authMiddleware");
 
 class AuthController {
   async authenticateUser(req, res) {
@@ -16,14 +15,27 @@ class AuthController {
       const result = await ixcService.authenticateUser(hotsite_email, senha);
 
       if (!result.success) {
-        return res.status(401).json(result);
+        return res.status(404).json({
+        success: false,
+        error: "Credenciais inválidas",
+        ixc_response: null,
+        request_id: generateRequestId() 
+      })
       }
 
-      return res.status(200).json({
+      res.json({
         success: true,
-        user: result.user,
-        // Removido a geração de token para o usuário
+        data: {
+          user_id: user.id,
+          email: user.hotsite_email,
+          name: user.nome || user.razao_social,
+        },
+        metadata: {
+          timestamp: new Date().toISOString(),
+          ixc_status: "authenticated",
+        },
       });
+      
     } catch (error) {
       return res.status(500).json({
         success: false,

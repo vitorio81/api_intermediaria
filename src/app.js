@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const authRoutes = require("./routers/authRoutes");
-const { errorHandler } = require("./madllewares/autMadlleware");
+const { errorHandler } = require("./madllewares/errorMiddleware");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,6 +11,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
+app.get('/api', (req, res) => {
+  res.json({ message: "API intermediária IXC online!" });
+});
 app.use("/api/auth", authRoutes);
 
 // Error handling
