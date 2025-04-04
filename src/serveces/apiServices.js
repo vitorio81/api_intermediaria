@@ -1,20 +1,16 @@
 require("dotenv").config();
 const axios = require("axios");
 
-const api = axios.create({
-  baseURL: process.env.API_USERS_URL,
-  headers: {
-    Authorization: `Bearer ${process.env.API_TOKEN}`,
-    "Content-Type": "application/json",
-  },
-});
-
-async function verifyUser(hotsite_email, password) {
+async function verifyUser(hotsite_email, senha) {
   try {
-    const response = await api.post("/auth-user", {
-      hotsite_email,
-      senha,
+    const response = await axios.get(`${process.env.API_USERS_URL}/cliente`, {
+      headers: {
+        "IXCSoft-Hotsite-Email": hotsite_email,
+        "IXCSoft-Hotsite-Senha": senha,
+        "Content-Type": "application/json"
+      }
     });
+
     return response.data;
   } catch (error) {
     console.error(

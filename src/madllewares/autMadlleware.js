@@ -1,24 +1,26 @@
 require("dotenv").config();
-const jwt = require("jsonwebtoken");
-
-const SECRET_KEY = process.env.API_SECRET_TOKEN;
 
 function verifyToken(req, res, next) {
-  const token = req.headers.authorization?.split(" ")[1];
+  const authHeader = req.headers.authorization;
 
-  if (!token) {
-    return res
-      .status(403)
-      .json({ error: "Acesso negado. Token não fornecido." });
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(403).json({
+      success: false,
+      error: "Acesso negado. Token não fornecido ou formato inválido.",
+    });
   }
 
-  try {
-    const decoded = jwt.verify(token, SECRET_KEY);
-    req.user = decoded;
-    next();
-  } catch (error) {
-    return res.status(401).json({ error: "Token inválido ou expirado." });
+  const token = authHeader.split(" ")[1];
+  const FIXED_API_TOKEN = process.env.FIXED_API_TOKEN; // Token fixo da API-TV
+
+  if (token !== FIXED_API_TOKEN) {
+    return res.status(401).json({
+      success: false,
+      error: "Token inválido.",
+    });
   }
+
+  next(); // Token válido, prossegue
 }
 
-module.exports = verifyToken;
+module.exports = { verifyToken };
